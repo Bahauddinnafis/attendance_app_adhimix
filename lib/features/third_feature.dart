@@ -1,5 +1,5 @@
-import 'package:absensi_adhimix/features/detail/report_absensi.dart';
-import 'package:absensi_adhimix/features/detail/reset_password.dart';
+import 'package:absensi_adhimix/features/details/report_absensi.dart';
+import 'package:absensi_adhimix/features/details/reset_password.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
