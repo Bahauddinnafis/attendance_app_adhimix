@@ -1,3 +1,5 @@
+import 'package:absensi_adhimix/features/detail/report_absensi.dart';
+import 'package:absensi_adhimix/features/detail/reset_password.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,17 +13,27 @@ class ThirdFeature extends StatelessWidget {
       children: [
         Column(
           children: [
-            Container(
-              height: 60,
-              width: 60,
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: const Icon(
-                Icons.lock_reset_outlined,
-                size: 48,
-                color: Colors.white,
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ResetPassword(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 60,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.lock_reset_outlined,
+                  size: 48,
+                  color: Colors.white,
+                ),
               ),
             ),
             const SizedBox(
@@ -60,17 +72,27 @@ class ThirdFeature extends StatelessWidget {
         ),
         Column(
           children: [
-            Container(
-              height: 60,
-              width: 60,
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: const Icon(
-                Icons.receipt_outlined,
-                size: 48,
-                color: Colors.white,
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ReportAbsensi(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 60,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.receipt_outlined,
+                  size: 48,
+                  color: Colors.white,
+                ),
               ),
             ),
             const SizedBox(
