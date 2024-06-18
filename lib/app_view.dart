@@ -1,5 +1,6 @@
 import 'package:absensi_adhimix/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyAppView extends StatelessWidget {
   const MyAppView({super.key});
@@ -20,4 +21,23 @@ class MyAppView extends StatelessWidget {
       home: const SplashScreen(),
     );
   }
+}
+
+TextStyle get subHeadingStyle {
+  return GoogleFonts.poppins(
+    textStyle: TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      color: Colors.grey[400],
+    ),
+  );
+}
+
+TextStyle get headingStyle {
+  return GoogleFonts.poppins(
+    textStyle: const TextStyle(
+      fontSize: 26,
+      fontWeight: FontWeight.bold,
+    ),
+  );
 }

@@ -34,33 +34,6 @@ class ReportAbsensi extends StatelessWidget {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            // Optional
-            // Column(
-            //   children: [
-            //     Center(
-            //       child: Text(
-            //         'BAHAUDDIN NAFIS AHMAD',
-            //         style: GoogleFonts.poppins(
-            //           textStyle: const TextStyle(
-            //             fontSize: 16,
-            //             color: Colors.black,
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //     Center(
-            //       child: Text(
-            //         '21081010308',
-            //         style: GoogleFonts.poppins(
-            //           textStyle: const TextStyle(
-            //             fontSize: 16,
-            //             color: Colors.black,
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
             Container(
               margin: const EdgeInsets.all(16.0),
               child: Table(
@@ -194,3 +167,32 @@ class ReportAbsensi extends StatelessWidget {
     );
   }
 }
+
+
+// Optional
+            // Column(
+            //   children: [
+            //     Center(
+            //       child: Text(
+            //         'BAHAUDDIN NAFIS AHMAD',
+            //         style: GoogleFonts.poppins(
+            //           textStyle: const TextStyle(
+            //             fontSize: 16,
+            //             color: Colors.black,
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //     Center(
+            //       child: Text(
+            //         '21081010308',
+            //         style: GoogleFonts.poppins(
+            //           textStyle: const TextStyle(
+            //             fontSize: 16,
+            //             color: Colors.black,
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),

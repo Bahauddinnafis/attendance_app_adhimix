@@ -1,3 +1,4 @@
+import 'package:absensi_adhimix/features/details/jadwal_matkul.dart';
 import 'package:absensi_adhimix/features/details/report_absensi.dart';
 import 'package:absensi_adhimix/features/details/reset_password.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ class ThirdFeature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Column(
           children: [
@@ -131,17 +132,27 @@ class ThirdFeature extends StatelessWidget {
         ),
         Column(
           children: [
-            Container(
-              height: 60,
-              width: 60,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: const Icon(
-                Icons.calendar_month,
-                size: 48,
-                color: Colors.white,
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const JadwalMatkul(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 60,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.calendar_month,
+                  size: 48,
+                  color: Colors.white,
+                ),
               ),
             ),
             const SizedBox(
@@ -151,7 +162,7 @@ class ThirdFeature extends StatelessWidget {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: 'Cuti',
+                    text: 'Jadwal',
                     style: GoogleFonts.poppins(
                       textStyle: const TextStyle(
                         fontSize: 12,
@@ -161,56 +172,7 @@ class ThirdFeature extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: '\n',
-                    style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(
-          width: 20,
-        ),
-        Column(
-          children: [
-            Container(
-              height: 60,
-              width: 60,
-              decoration: BoxDecoration(
-                color: Colors.yellow,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: const Icon(
-                Icons.date_range_rounded,
-                size: 48,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: 'Lembur',
-                    style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  TextSpan(
-                    text: '\n',
+                    text: '\nMatkul',
                     style: GoogleFonts.poppins(
                       textStyle: const TextStyle(
                         fontSize: 12,
