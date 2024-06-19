@@ -1,8 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:absensi_adhimix/screens/login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class MainFeature extends StatelessWidget {
+class MainFeature extends StatefulWidget {
   const MainFeature({super.key});
+
+  @override
+  _MainFeatureState createState() => _MainFeatureState();
+}
+
+class _MainFeatureState extends State<MainFeature> {
+  String _currentAddress = '';
+
+  // Logout
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
+      ),
+      (route) => false,
+    );
+  }
+
+  // Geolocator
+  void _getCurrentLocation() async {
+  try {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    setState(() {
+      _currentAddress = "${position.latitude}, ${position.longitude}";
+    });
+    print("Location fetched: $_currentAddress");
+  } catch (e) {
+    print("Error getting location: $e");
+    setState(() {
+      _currentAddress = "Failed to get location";
+    });
+  }
+}
+
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +233,7 @@ class MainFeature extends StatelessWidget {
                     ),
                     Expanded(
                       child: Text(
-                        'LAvenue Office Tower Lt. 16, Jl. Raya Pasar Minggu Kav.16, Pancoran, Jakarta Selatan 12780',
+                        _currentAddress,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.poppins(
@@ -236,20 +282,23 @@ class MainFeature extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  width: 100,
-                  height: 27,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2196F3),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'KELUAR',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+                GestureDetector(
+                  onTap: () => _logout(context),
+                  child: Container(
+                    width: 100,
+                    height: 27,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2196F3),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'KELUAR',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),

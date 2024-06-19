@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1074363599283",
+    "project_id": "attendance-adhimix",
+    "storage_bucket": "attendance-adhimix.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074363599283:android:239815d7319568db6ea3c6",
+        "android_client_info": {
+          "package_name": "com.example.absensi_adhimix"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx2ISQ67vGTxW16Y1K-535RqCV2CEyQ20"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

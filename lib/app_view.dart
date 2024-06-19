@@ -12,7 +12,7 @@ class MyAppView extends StatelessWidget {
       title: "Adhimix Yuk Absen",
       theme: ThemeData(
         colorScheme: const ColorScheme.light(
-          background: Colors.white,
+          surface: Colors.white,
           primary: Color(0xFFEB0009),
           secondary: Color(0xFF840005),
           tertiary: Color(0xFF5F5E5E),

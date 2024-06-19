@@ -1,9 +1,22 @@
 import 'package:absensi_adhimix/screens/login_screen.dart';
+import 'package:absensi_adhimix/services/auth_service_signUp.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+
+  bool _isObscured = true;
+  final AuthServiceSignUP _authService = AuthServiceSignUP();
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +37,10 @@ class RegisterScreen extends StatelessWidget {
                 const SizedBox(height: 50),
                 // Username TextField
                 TextField(
+                  controller: _usernameController,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
-                      Icons.person,
+                      Icons.mail,
                       color: Colors.grey,
                     ),
                     labelText: 'Username',
@@ -43,6 +57,7 @@ class RegisterScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 // Email TextField
                 TextField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.mail,
@@ -62,7 +77,8 @@ class RegisterScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 // Password TextField
                 TextField(
-                  obscureText: true,
+                  controller: _passwordController,
+                  obscureText: _isObscured,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.lock,
@@ -77,9 +93,16 @@ class RegisterScreen extends StatelessWidget {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    suffixIcon: const Icon(
-                      Icons.visibility_off,
-                      color: Colors.grey,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscured ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscured = !_isObscured;
+                        });
+                      },
                     ),
                   ),
                 ),
@@ -88,12 +111,13 @@ class RegisterScreen extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await registerWithEmailPassword();
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
                           builder: (context) => const LoginScreen(),
                         ),
-                        (route) => false,
+                        (route) => false
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -125,5 +149,18 @@ class RegisterScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> registerWithEmailPassword() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    final username = _usernameController.text;
+
+    if (email.isEmpty || password.isEmpty || username.isEmpty) {
+      print('Email dan Password tidak boleh kosong');
+      return;
+    }
+
+    return await _authService.signUp(email: email, password: password, username: username);
   }
 }

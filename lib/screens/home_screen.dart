@@ -5,10 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final String username;
+  const HomeScreen({super.key, required this.username});
+
+  String getGreetings() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Selamat Pagi';
+    } else if (hour < 18) {
+      return 'Selamat Siang';
+    } else {
+      return 'Selamat Malam';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    String greeting = getGreetings();
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(150),
@@ -40,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: 'Selamat Pagi',
+                              text: greeting,
                               style: GoogleFonts.poppins(
                                 textStyle: const TextStyle(
                                   fontSize: 18,
@@ -49,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: '\nBAHAUDDIN NAFIS AHMAD',
+                              text: '\n$username',
                               style: GoogleFonts.poppins(
                                 textStyle: const TextStyle(
                                   fontSize: 15,
