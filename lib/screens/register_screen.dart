@@ -40,7 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _usernameController,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
-                      Icons.mail,
+                      Icons.person,
                       color: Colors.grey,
                     ),
                     labelText: 'Username',
@@ -157,10 +157,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final username = _usernameController.text;
 
     if (email.isEmpty || password.isEmpty || username.isEmpty) {
-      print('Email dan Password tidak boleh kosong');
+      print('Email, Username, dan Password tidak boleh kosong');
       return;
     }
 
-    return await _authService.signUp(email: email, password: password, username: username);
+    await _authService.signUp(
+      email: email,
+      password: password,
+      username: username,
+    );
   }
 }

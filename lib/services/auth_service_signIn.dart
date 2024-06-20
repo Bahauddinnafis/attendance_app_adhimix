@@ -35,7 +35,7 @@ class AuthServiceSignin {
         fontSize: 14.0,
       );
       print('FirebaseAuthException: $e');
-      throw e;
+      rethrow;
     } catch (e) {
       print('Error: $e');
       Fluttertoast.showToast(

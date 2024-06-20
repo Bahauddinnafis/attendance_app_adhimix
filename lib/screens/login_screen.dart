@@ -4,7 +4,9 @@ import 'package:absensi_adhimix/services/auth_service_signIn.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -298,8 +300,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       await _authService.signIn(email: email, password: password);
+
+      var status = await Permission.location.request();
+      if (status.isGranted) {
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+
+        User? user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await _firestore.collection('users').doc(user.uid).update({
+            'latitude': position.latitude,
+            'longitude': position.longitude,
+          });
+
+          print(
+              'Lokasi pengguna telah disimpan: ${position.latitude}, ${position.longitude}');
+        }
+      } else {
+        print('Izin lokasi ditolak');
+      }
+
       return true;
     } catch (e) {
+      print('Error during sign-in: $e');
       return false;
     }
   }

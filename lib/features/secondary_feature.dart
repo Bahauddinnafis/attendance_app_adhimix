@@ -1,11 +1,74 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
-class SecondaryFeature extends StatelessWidget {
+class SecondaryFeature extends StatefulWidget {
   const SecondaryFeature({super.key});
 
   @override
+  State<SecondaryFeature> createState() => _SecondaryFeatureState();
+}
+
+class _SecondaryFeatureState extends State<SecondaryFeature> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  DateTime? checkInTimeYesterday;
+  DateTime? checkOutTimeYesterday;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _getYesterdayAttendance() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
+        String yesterdayDate = DateFormat('yyyy-MM-dd').format(yesterday);
+        DocumentSnapshot userDoc = await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('attendance')
+            .doc('yesterday')
+            .get();
+        if (userDoc.exists) {
+          setState(() {
+            checkInTimeYesterday = userDoc['checkInTime']?.toDate();
+            checkOutTimeYesterday = userDoc['checkOutTime']?.toDate();
+          });
+          print('Yesterday\'s attendance data fetched successfully.');
+        }
+      } else {
+        setState(() {
+          checkInTimeYesterday = null;
+          checkOutTimeYesterday = null;
+        });
+        print('No attendance data for yesterday.');
+      }
+    } catch (e) {
+      print('Error fetching yesterday\'s data: $e');
+    }
+  }
+
+  String formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) {
+      return '-';
+    } else {
+      return DateFormat('HH:mm:ss').format(dateTime);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    DateTime today = DateTime.now();
+    DateTime yesterday = today.subtract(const Duration(days: 1));
+
+    String formattedYesterday =
+        DateFormat('EEEE, d MMMM yyyy').format(yesterday);
+
     return Container(
       height: 69,
       width: 320,
@@ -30,7 +93,7 @@ class SecondaryFeature extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              'Minggu, 16 Juni 2024',
+              formattedYesterday,
               style: GoogleFonts.poppins(
                 textStyle: const TextStyle(
                   fontSize: 12,
@@ -68,7 +131,7 @@ class SecondaryFeature extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '08:06:49',
+                      formatDateTime(checkInTimeYesterday),
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           fontSize: 12,
@@ -91,7 +154,7 @@ class SecondaryFeature extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '17:08:45',
+                      formatDateTime(checkOutTimeYesterday),
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           fontSize: 12,

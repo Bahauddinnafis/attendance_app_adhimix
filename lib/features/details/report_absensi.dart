@@ -1,8 +1,69 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
-class ReportAbsensi extends StatelessWidget {
+class ReportAbsensi extends StatefulWidget {
   const ReportAbsensi({super.key});
+
+  @override
+  State<ReportAbsensi> createState() => _ReportAbsensiState();
+}
+
+class _ReportAbsensiState extends State<ReportAbsensi> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<Map<String, dynamic>> allAttendanceData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getAllAttendanceData();
+  }
+
+  Future<void> _getAllAttendanceData() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        QuerySnapshot attendanceSnapShot = await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('attendance')
+            .get();
+
+        List<Map<String, dynamic>> attendanceData = [];
+        for (var doc in attendanceSnapShot.docs) {
+          var data = doc.data() as Map<String, dynamic>;
+          DateTime? checkInTime = data['checkInTime']?.toDate();
+          DateTime? checkOutTime = data['checkOutTime']?.toDate();
+          String date = doc.id;
+
+          attendanceData.add({
+            'date': date,
+            'checkInTime': checkInTime,
+            'checkOutTime': checkOutTime,
+          });
+
+          setState(() {
+            allAttendanceData = attendanceData;
+          });
+          print('All attendance data fetched successfully.');
+        }
+      } else {
+        print('User not logged in.');
+      }
+    } catch (e) {
+      print('Error fetching attendance data: $e');
+    }
+  }
+
+  String formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) {
+      return '-';
+    } else {
+      return DateFormat('HH:mm:ss').format(dateTime);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +104,8 @@ class ReportAbsensi extends StatelessWidget {
                 ),
                 columnWidths: const {
                   0: FlexColumnWidth(2),
-                  1: FlexColumnWidth(3),
+                  1: FlexColumnWidth(2),
                   2: FlexColumnWidth(2),
-                  3: FlexColumnWidth(2),
                 },
                 children: [
                   TableRow(
@@ -60,21 +120,6 @@ class ReportAbsensi extends StatelessWidget {
                           child: const Center(
                             child: Text(
                               'Tanggal',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          color: Colors.blueGrey,
-                          child: const Center(
-                            child: Text(
-                              'Mata Kuliah',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -115,44 +160,32 @@ class ReportAbsensi extends StatelessWidget {
                       ),
                     ],
                   ),
-                  for (var i = 0; i < 15; i++)
+                  for (var attendance in allAttendanceData)
                     TableRow(
                       children: [
                         TableCell(
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Center(
-                              child: Text('2023-11-${29 - i}'),
+                              child: Text(attendance['date']),
                             ),
                           ),
                         ),
                         TableCell(
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: const Center(
-                              child: Expanded(
-                                child: Text(
-                                  'Pemrograman Berorientasi Objek',
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
+                            child: Center(
+                              child: Text(
+                                  formatDateTime(attendance['checkInTime'])),
                             ),
                           ),
                         ),
                         TableCell(
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: const Center(
-                              child: Text('07:50:35'),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: const Center(
-                              child: Text('17:25:54'),
+                            child: Center(
+                              child: Text(
+                                  formatDateTime(attendance['checkOutTime'])),
                             ),
                           ),
                         ),
@@ -167,32 +200,3 @@ class ReportAbsensi extends StatelessWidget {
     );
   }
 }
-
-
-// Optional
-            // Column(
-            //   children: [
-            //     Center(
-            //       child: Text(
-            //         'BAHAUDDIN NAFIS AHMAD',
-            //         style: GoogleFonts.poppins(
-            //           textStyle: const TextStyle(
-            //             fontSize: 16,
-            //             color: Colors.black,
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //     Center(
-            //       child: Text(
-            //         '21081010308',
-            //         style: GoogleFonts.poppins(
-            //           textStyle: const TextStyle(
-            //             fontSize: 16,
-            //             color: Colors.black,
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
