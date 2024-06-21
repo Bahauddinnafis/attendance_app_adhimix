@@ -20,6 +20,7 @@ class _SecondaryFeatureState extends State<SecondaryFeature> {
   @override
   void initState() {
     super.initState();
+    _getYesterdayAttendance();
   }
 
   Future<void> _getYesterdayAttendance() async {
@@ -32,12 +33,14 @@ class _SecondaryFeatureState extends State<SecondaryFeature> {
             .collection('users')
             .doc(user.uid)
             .collection('attendance')
-            .doc('yesterday')
+            .doc(yesterdayDate)
             .get();
         if (userDoc.exists) {
           setState(() {
-            checkInTimeYesterday = userDoc['checkInTime']?.toDate();
-            checkOutTimeYesterday = userDoc['checkOutTime']?.toDate();
+            checkInTimeYesterday =
+                (userDoc['checkInTime'] as Timestamp?)?.toDate();
+            checkOutTimeYesterday =
+                (userDoc['checkOutTime'] as Timestamp?)?.toDate();
           });
           print('Yesterday\'s attendance data fetched successfully.');
         }

@@ -1,3 +1,4 @@
+import 'package:absensi_adhimix/screens/forget_password.dart';
 import 'package:absensi_adhimix/screens/home_screen.dart';
 import 'package:absensi_adhimix/screens/register_screen.dart';
 import 'package:absensi_adhimix/services/auth_service_signIn.dart';
@@ -97,7 +98,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      // Implementasi aksi lupa password
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const ForgetPassword(),
+                        ),
+                        (route) => false,
+                      );
                     },
                     child: Text(
                       'Lupa Password?',

@@ -48,7 +48,7 @@ class _MainFeatureState extends State<MainFeature> {
       setState(() {
         checkOutTime = now;
         isCheckInEnabled = false;
-        isCheckOutEnabled = true;
+        isCheckOutEnabled = false;
       });
       _saveCheckOutTime(now);
     }
@@ -360,7 +360,10 @@ class _MainFeatureState extends State<MainFeature> {
               height: 35,
               child: ElevatedButton(
                 onPressed: isCheckInEnabled || isCheckOutEnabled
-                    ? recordAttendance
+                    ? () {
+                        recordAttendance();
+                        _getCurrentLocation();
+                      }
                     : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
