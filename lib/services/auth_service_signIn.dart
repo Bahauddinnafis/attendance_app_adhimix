@@ -116,4 +116,52 @@ class AuthServiceSignin {
       return null;
     }
   }
+
+  // Forget Password
+  Future<void> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      Fluttertoast.showToast(
+        msg: "Password reset email sent",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.SNACKBAR,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 14.0,
+      );
+    } on FirebaseAuthException catch (e) {
+      Fluttertoast.showToast(
+        msg: e.message ?? 'An unknown error occurred',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.SNACKBAR,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 14.0,
+      );
+      print('FirebaseAuthException: $e');
+    } catch (e) {
+      print('Error: $e');
+      Fluttertoast.showToast(
+        msg: 'An unknown error occurred. Please try again.',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.SNACKBAR,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 14.0,
+      );
+    }
+  }
+
+  // Update Password
+  Future<void> UpdatePassword(String oldPassword, String newPassword) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      String email = user.email!;
+
+      AuthCredential credential = EmailAuthProvider.credential(email: email, password: oldPassword);
+      await user.reauthenticateWithCredential(credential);
+
+      await user.updatePassword(newPassword);
+    }
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:absensi_adhimix/features/details/jadwal_matkul.dart';
 import 'package:absensi_adhimix/features/details/report_absensi.dart';
-import 'package:absensi_adhimix/features/details/reset_password.dart';
+import 'package:absensi_adhimix/features/details/update_password.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,7 +19,7 @@ class ThirdFeature extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ResetPassword(),
+                    builder: (context) => const UpdatePassword(),
                   ),
                 );
               },

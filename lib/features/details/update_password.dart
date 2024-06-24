@@ -1,9 +1,49 @@
-import 'package:absensi_adhimix/screens/login_screen.dart';
+import 'package:absensi_adhimix/services/auth_service_signIn.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ResetPassword extends StatelessWidget {
-  const ResetPassword({super.key});
+class UpdatePassword extends StatefulWidget {
+  const UpdatePassword({super.key});
+
+  @override
+  State<UpdatePassword> createState() => _UpdatePasswordState();
+}
+
+class _UpdatePasswordState extends State<UpdatePassword> {
+  final TextEditingController _passwordLamaController = TextEditingController();
+  final TextEditingController _passwordBaruController = TextEditingController();
+  final TextEditingController _passwordUlangController =
+      TextEditingController();
+  final AuthServiceSignin _authService = AuthServiceSignin();
+
+  bool _isObscuredLama = true;
+  bool _isObscuredBaru = true;
+  bool _isObscuredUlang = true;
+
+  void _updatePassword() async {
+    final String oldPassword = _passwordLamaController.text;
+    final String newPassword = _passwordBaruController.text;
+    final String confirmPassword = _passwordUlangController.text;
+
+    if (newPassword != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kata sandi baru tidak cocok')),
+      );
+      return;
+    }
+
+    try {
+      await _authService.UpdatePassword(oldPassword, newPassword);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kata sandi berhasil diperbarui')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+       ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal memperbarui kata sandi: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +98,39 @@ class ResetPassword extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 50),
+                TextField(
+                  controller: _passwordLamaController,
+                  obscureText: _isObscuredLama,
+                  decoration: InputDecoration(
+                    labelText: 'Kata Sandi Lama',
+                    labelStyle: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscuredLama
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscuredLama = !_isObscuredLama;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 // New Password TextField
                 TextField(
-                  obscureText: true,
+                  controller: _passwordBaruController,
+                  obscureText: _isObscuredBaru,
                   decoration: InputDecoration(
                     labelText: 'Kata Sandi Baru',
                     labelStyle: GoogleFonts.poppins(
@@ -71,16 +141,26 @@ class ResetPassword extends StatelessWidget {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    suffixIcon: const Icon(
-                      Icons.visibility_off,
-                      color: Colors.grey,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscuredBaru
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscuredBaru = !_isObscuredBaru;
+                        });
+                      },
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 // Repeat New Password TextField
                 TextField(
-                  obscureText: true,
+                  controller: _passwordUlangController,
+                  obscureText: _isObscuredUlang,
                   decoration: InputDecoration(
                     labelText: 'Ulangi Kata Sandi Baru',
                     labelStyle: GoogleFonts.poppins(
@@ -91,9 +171,18 @@ class ResetPassword extends StatelessWidget {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    suffixIcon: const Icon(
-                      Icons.visibility_off,
-                      color: Colors.grey,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscuredUlang
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscuredUlang = !_isObscuredUlang;
+                        });
+                      },
                     ),
                   ),
                 ),
@@ -102,14 +191,7 @@ class ResetPassword extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
+                    onPressed: _updatePassword,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 15),

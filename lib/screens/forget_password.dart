@@ -1,9 +1,19 @@
 import 'package:absensi_adhimix/screens/login_screen.dart';
+import 'package:absensi_adhimix/services/auth_service_signIn.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ForgetPassword extends StatelessWidget {
+class ForgetPassword extends StatefulWidget {
   const ForgetPassword({super.key});
+
+  @override
+  State<ForgetPassword> createState() => _ForgetPasswordState();
+}
+
+class _ForgetPasswordState extends State<ForgetPassword> {
+  final TextEditingController _emailController = TextEditingController();
+  final AuthServiceSignin _authService = AuthServiceSignin();
 
   @override
   Widget build(BuildContext context) {
@@ -63,51 +73,64 @@ class ForgetPassword extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 50),
-                // New Password TextField
-                TextField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Kata Sandi Baru',
-                    labelStyle: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                        color: Colors.grey,
+                // Confirm Email TextField
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Konfirmasi Email Anda',
+                      style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    suffixIcon: const Icon(
-                      Icons.visibility_off,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Repeat New Password TextField
-                TextField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Ulangi Kata Sandi Baru',
-                    labelStyle: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                        color: Colors.grey,
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Konfirmasi Email Anda',
+                        labelStyle: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        suffixIcon: const Icon(
+                          Icons.email,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    suffixIcon: const Icon(
-                      Icons.visibility_off,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  ],
                 ),
+
                 const SizedBox(height: 50),
                 // Reset Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      String email = _emailController.text;
+                      // String password = _passwordController.text;
+                      // String repeatPassword = _repeatPasswordController.text;
+
+                      if (email.isEmpty) {
+                        Fluttertoast.showToast(
+                          msg: "Email tidak boleh kosong",
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.SNACKBAR,
+                          backgroundColor: Colors.black54,
+                          textColor: Colors.white,
+                          fontSize: 14.0,
+                        );
+                        return;
+                      }
+
+                      await _authService.resetPassword(email);
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
                           builder: (context) => const LoginScreen(),
