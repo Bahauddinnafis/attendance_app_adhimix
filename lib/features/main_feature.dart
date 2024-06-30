@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:absensi_adhimix/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -28,71 +29,120 @@ class _MainFeatureState extends State<MainFeature> {
   bool isCheckOutEnabled = false;
 
   // Rekam Absen
-  void recordAttendance() {
-    DateTime now = DateTime.now();
+  void recordAttendance() async {
+    DateTime now = DateTime.now(); // Tidak perlu await di sini
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    String address =
+        await _getAddressFromLatLng(position.latitude, position.longitude);
+
     if (checkInTime == null && checkOutTime == null) {
       setState(() {
         checkInTime = now;
         isCheckInEnabled = false;
         isCheckOutEnabled = true;
       });
-      _saveCheckInTime(now);
-    } else if (checkInTime != null && checkOutTime != null) {
+      _saveCheckInTime(now, address, position.latitude, position.longitude);
+    } else if (checkInTime != null && checkOutTime == null) {
       setState(() {
         checkOutTime = now;
         isCheckInEnabled = true;
         isCheckOutEnabled = false;
       });
-      _saveCheckOutTime(now);
-    } else if (checkInTime != null && checkOutTime == null) {
-      setState(() {
-        checkOutTime = now;
-        isCheckInEnabled = false;
-        isCheckOutEnabled = false;
-      });
-      _saveCheckOutTime(now);
+      _saveCheckOutTime(now, address, position.latitude, position.longitude);
     }
   }
 
-  Future<void> _saveCheckInTime(DateTime checkInTime) async {
+  Future<void> _saveCheckInTime(
+      DateTime checkInTime, String address, double lat, double lng) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-        await _firestore
+        DocumentReference docRef = _firestore
             .collection('users')
             .doc(user.uid)
             .collection('attendance')
-            .doc(todayDate)
-            .set({
-          'checkInTime': checkInTime,
-          'checkOutTime': null,
-        });
-        print('Check-in time saved to firestore: $checkInTime');
+            .doc(todayDate);
+
+        // Gunakan set() untuk membuat atau memperbarui dokumen
+        await docRef.set(
+            {
+              'checkInTime': checkInTime,
+              'checkOutTime': null,
+              'checkInAddress': address,
+              'latitude': lat,
+              'longitude': lng,
+            },
+            SetOptions(
+                merge:
+                    true)); // Menggunakan merge: true untuk tidak menimpa data yang ada
+
+        print('Check-in time and address saved to Firestore: $checkInTime');
       }
     } catch (e) {
-      print('Error saving check-in time');
+      print('Error saving check-in time: $e');
     }
   }
 
-  Future<void> _saveCheckOutTime(DateTime checkOutTime) async {
+  Future<void> _saveCheckOutTime(
+      DateTime checkOutTime, String address, double lat, double lng) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-        await _firestore
+        DocumentReference docRef = _firestore
             .collection('users')
             .doc(user.uid)
             .collection('attendance')
-            .doc(todayDate)
-            .update({
-          'checkOutTime': checkOutTime,
-        });
-        print('Check-out time saved to Firestore: $checkOutTime');
+            .doc(todayDate);
+
+        // Gunakan set() untuk membuat atau memperbarui dokumen
+        await docRef.set(
+            {
+              'checkOutTime': checkOutTime,
+              'checkoutAddress': address,
+              'latitude': lat,
+              'longitude': lng,
+            },
+            SetOptions(
+                merge:
+                    true)); // Menggunakan merge: true untuk tidak menimpa data yang ada
+
+        print('Check-out time and address saved to Firestore: $checkOutTime');
       }
     } catch (e) {
       print('Error saving check-out time: $e');
     }
+  }
+
+  Future<void> _initializeUserAttendanceCollection() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        DocumentReference docRef = _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('attendance')
+            .doc(todayDate);
+
+        // Gunakan set() untuk membuat dokumen jika belum ada
+        await docRef.set({
+          'initialized': true, // Tambahkan field untuk inisialisasi
+        }, SetOptions(merge: true));
+
+        print('Attendance collection initialized for user: ${user.uid}');
+      }
+    } catch (e) {
+      print('Error initializing attendance collection: $e');
+    }
+  }
+
+  void onUserLogin() async {
+    // Panggil metode ini setelah login sukses
+    await _initializeUserAttendanceCollection();
+    // Lanjutkan dengan logika aplikasi Anda
   }
 
   String formatDateTime(DateTime? dateTime) {
@@ -152,7 +202,7 @@ class _MainFeatureState extends State<MainFeature> {
         setState(() {
           _currentAddress = "${position.latitude}, ${position.longitude}";
         });
-        print('Location fetched: $_currentAddress');
+        _getAddressFromLatLng(position.latitude, position.longitude);
       } else if (status.isDenied || status.isPermanentlyDenied) {
         setState(() {
           _currentAddress = "Location permission are denied";
@@ -163,10 +213,32 @@ class _MainFeatureState extends State<MainFeature> {
         });
       }
     } catch (e) {
-      print("Error getting location : $e");
+      print("Error getting location: $e");
       setState(() {
         _currentAddress = "Failed to get location.";
       });
+    }
+  }
+
+  Future<String> _getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      Placemark place = placemarks[0];
+
+      String address =
+          "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+
+      setState(() {
+        _currentAddress = address;
+      });
+
+      return address;
+    } catch (e) {
+      print("Error getting address: $e");
+      setState(() {
+        _currentAddress = "Failed to get location.";
+      });
+      return "Failed to get location.";
     }
   }
 
@@ -186,25 +258,21 @@ class _MainFeatureState extends State<MainFeature> {
           setState(() {
             checkInTime = userDoc['checkInTime']?.toDate();
             checkOutTime = userDoc['checkOutTime']?.toDate();
+            isCheckInEnabled = checkInTime == null;
+            isCheckOutEnabled = checkInTime != null && checkOutTime == null;
           });
-          print('Attendance data fetched successfully.');
         } else {
-          setState(() {
-            checkInTime = null;
-            checkOutTime = null;
-          });
-          print('No attendance data for today.');
+          print('User attendance data not found for today.');
         }
       }
     } catch (e) {
-      print('Error fetching attendance data: $e');
+      print('Error getting user attendance data: $e');
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
     _getCurrentUserAttendance();
   }
 

@@ -73,7 +73,7 @@ class _SecondaryFeatureState extends State<SecondaryFeature> {
         DateFormat('EEEE, d MMMM yyyy').format(yesterday);
 
     return Container(
-      height: 69,
+      height: 79,
       width: 320,
       decoration: BoxDecoration(
         color: Colors.white,
